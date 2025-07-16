@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Notícias</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f9f9f9;
+            color: #222;
+        }
+
+        .header {
+            background-color: #800000;
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .header-buttons button {
+            background-color: white;
+            color: #800000;
+            padding: 8px 16px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .header-buttons button:hover {
+            background-color: #f0f0f0;
+        }
+
+        .top-nav {
+            background-color: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .top-nav ul {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .top-nav li a {
+            text-decoration: none;
+            color: #800000;
+            font-weight: bold;
+            font-size: 16px;
+            padding: 8px 12px;
+            border-radius: 5px;
+            transition: background 0.3s;
+            cursor: pointer;
+        }
+
+        .top-nav li a:hover {
+            background-color: #ffe5e5;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            margin: 30px 10px;
+        }
+
+        .news-section {
+            width: 100%;
+            max-width: 750px;
+        }
+
+        .news-item {
+            background: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+            position: relative;
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .news-title {
+            color: #5a0000;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .news-description {
+            font-size: 16px;
+            color: #444;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .news-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-top: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        .news-item a {
+            color: #800000;
+            text-decoration: none;
+        }
+
+        .news-item a:hover {
+            text-decoration: underline;
+        }
+
+        .delete-button {
+            background-color: #800000;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 13px;
+            border-radius: 5px;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            transition: background 0.3s;
+        }
+
+        .delete-button:hover {
+            background-color: #5a0000;
+        }
+
+        .publish-button {
+            background-color: #800000;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 30px;
+            margin-bottom: 15px;
+            transition: background-color 0.3s ease;
+        }
+
+        .publish-button:hover {
+            background-color: #5a0000;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            width: 320px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        }
+
+        .modal-content h2 {
+            color: #800000;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        #searchContainer {
+            max-width: 750px;
+            margin: 0 auto 15px auto;
+            display: flex;
+            justify-content: center;
+        }
+
+        #searchInput {
+            width: 100%;
+            max-width: 350px;
+            padding: 10px 15px;
+            font-size: 16px;
+            border-radius: 25px;
+            border: 1px solid #ccc;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        #searchInput:focus {
+            border-color: #800000;
+        }
+
+        #saibaMais, #contato {
+            display: none;
+            padding: 60px 20px;
+            text-align: center;
+            background-color: #fff0f0;
+            margin-top: 40px;
+            max-width: 750px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #saibaMais.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>📰 Notícias</div>
+        <div class="header-buttons">
+            <button onclick="location.href='chat.html'">Chat</button>
+            <button onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <nav class="top-nav">
+        <ul>
+            <li><a href="#" onclick="mostrarContato()">Contato</a></li>
+            <li><a href="#" onclick="voltarInicio()">Início</a></li>
+            <li><a href="#" onclick="mostrarSaibaMais()">Saiba Mais</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="news-section" id="publicacao">
+            <button id="openModalButton" class="publish-button" style="display: none;">Publicar Notícia</button>
+            <div id="searchContainer">
+                <input type="text" id="searchInput" placeholder="Pesquisar título da notícia..." />
+            </div>
+            <div id="newsContainer"></div>
+        </div>
+    </div>
+
+    <div id="publishModal" class="modal">
+        <div class="modal-content">
+            <h2>📝 Publicar Notícia</h2>
+            <input type="text" id="newsTitle" placeholder="Título da notícia" />
+            <input type="text" id="newsCaption" placeholder="Descrição da notícia" />
+            <input type="text" id="newsImage" placeholder="URL da imagem" />
+            <div class="modal-buttons">
+                <button class="publish-button" onclick="publishNews()">Publicar</button>
+                <button onclick="closeModal()">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="contato">
+        <h2 style="color: #800000; font-size: 24px;">📞 Contato</h2>
+        <p style="font-size: 16px; max-width: 700px; margin: 20px auto; line-height: 1.6;">
+            Para entrar em contato conosco, envie um e-mail para <a">vini05lu@gmail.com
+        <p> Ou ligue para (11) 972848599. Estamos aqui para ajudar com qualquer dúvida ou sugestão que você tenha sobre o nosso portal de notícias.
+        </p>
+    </div>
+
+    <div id="saibaMais">
+        <h2 style="color: #800000; font-size: 24px;">📚 Saiba Mais</h2>
+        <p style="font-size: 16px; max-width: 700px; margin: 20px auto; line-height: 1.6;">
+            Nosso portal oferece notícias atualizadas com uma curadoria especial feita por nossos editores. Além das notícias, temos conteúdos exclusivos sobre temas relevantes. Navegue pelas seções e fique bem informado!
+        </p>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+        </div>
+    </footer>
+
+    <script>
+        window.logout = function() {
+            sessionStorage.removeItem("loggedInUser");
+            window.location.href = "./news.html";
+        };
+
+        let allNews = []; // para guardar todas as notícias carregadas
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const user = JSON.parse(sessionStorage.getItem("loggedInUser"));
+            if (!user) {
+                window.location.href = "./index.html";
+                return;
+            }
+
+            if (user.role === "admin") {
+                document.getElementById("openModalButton").style.display = "block";
+            }
+
+            loadNews();
+            setInterval(updateLikes, 5000);
+
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                filterNews(e.target.value);
+            });
+        });
+
+        function updateLikes() {
+            fetch("/curtidas")
+                .then(res => res.json())
+                .then(curtidas => {
+                    Object.keys(curtidas).forEach(id => {
+                        const span = document.getElementById(`likes_${id}_count`);
+                        if (span) {
+                            span.textContent = `${curtidas[id]} curtidas`;
+                        }
+                    });
+                });
+        }
+
+        function loadNews() {
+            Promise.all([
+                fetch("/images").then(res => res.json()),
+                fetch("/curtidas").then(res => res.json())
+            ]).then(([images, curtidas]) => {
+                allNews = images; // guardo todas as notícias
+
+                renderNews(images, curtidas);
+            });
+        }
+
+        function renderNews(images, curtidas) {
+            const newsContainer = document.getElementById("newsContainer");
+            newsContainer.innerHTML = '';
+
+            images.forEach(image => {
+                const newsItem = document.createElement("div");
+                newsItem.classList.add("news-item");
+                newsItem.style.opacity = '1'; // Para animar direto
+
+                const formattedCaption = formatText(image.caption || "Descrição da notícia.");
+                const likes = curtidas[image.id] || 0;
+
+                newsItem.innerHTML = `
+                    <div class="news-title">${image.title || "Título da Notícia"}</div>
+                    <div class="news-description">${formattedCaption}</div>
+                    ${image.url ? `<img src="${image.url}" alt="Imagem">` : ""}
+                    <div style="margin-top: 10px;">
+                        <span id="likes_${image.id}_count" style="font-size: 14px; color: #333;">${likes} curtidas</span>
+                    </div>
+                    ${isAdmin() ? `<button class="delete-button" onclick="deleteImage('${image.id}')">Excluir</button>` : ""}
+                `;
+
+                newsContainer.appendChild(newsItem);
+            });
+        }
+
+        function filterNews(searchTerm) {
+            searchTerm = searchTerm.toLowerCase();
+
+            fetch("/curtidas")
+                .then(res => res.json())
+                .then(curtidas => {
+                    const filtered = allNews.filter(news =>
+                        (news.title || "").toLowerCase().includes(searchTerm)
+                    );
+                    renderNews(filtered, curtidas);
+                });
+        }
+
+        function publishNews() {
+            const user = JSON.parse(sessionStorage.getItem("loggedInUser"));
+            if (!user || user.role !== "admin") {
+                alert("Apenas administradores podem publicar notícias!");
+                return;
+            }
+
+            const title = document.getElementById('newsTitle').value;
+            const caption = document.getElementById('newsCaption').value;
+            const imageUrl = document.getElementById('newsImage').value;
+
+            fetch('/save-image', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, caption, url: imageUrl })
+            }).then(() => {
+                closeModal();
+                loadNews();
+                document.getElementById('searchInput').value = '';
+            });
+        }
+
+        function formatText(text) {
+            return text.replace(/(https?:\/\/[^\s]+)/g, (url) => {
+                return `<a href="${url}" target="_blank">${url}</a>`;
+            });
+        }
+
+        window.deleteImage = function(id) {
+            if (!confirm("Tem certeza que deseja excluir esta notícia?")) return;
+
+            fetch(`/delete-image/${id}`, { method: 'DELETE' })
+                .then(response => {
+                    if (response.ok) {
+                        loadNews();
+                    } else {
+                        alert("Erro ao excluir a notícia!");
+                    }
+                })
+                .catch(error => console.error("Erro ao excluir:", error));
+        };
+
+        function isAdmin() {
+            const user = JSON.parse(sessionStorage.getItem("loggedInUser"));
+            return user && user.role === "admin";
+        }
+
+        function closeModal() {
+            document.getElementById("publishModal").style.display = "none";
+        }
+
+        document.getElementById("openModalButton").addEventListener("click", () => {
+            if (isAdmin()) {
+                document.getElementById("publishModal").style.display = "flex";
+            } else {
+                alert("Apenas administradores podem publicar notícias!");
+            }
+        });
+
+        function mostrarContato() {
+            document.getElementById("contato").style.display = "block";
+            document.getElementById("publicacao").style.display = "none";
+            document.getElementById("saibaMais").style.display = "none";
+
+            document.getElementById("contato").scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function mostrarSaibaMais() {
+            document.getElementById("saibaMais").style.display = "block";
+            document.getElementById("publicacao").style.display = "none";
+            document.getElementById("contato").style.display = "none";
+
+            document.getElementById("saibaMais").scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function voltarInicio() {
+            document.getElementById("publicacao").style.display = "block";
+            document.getElementById("contato").style.display = "none";
+            document.getElementById("saibaMais").style.display = "none";
+
+            document.getElementById("publicacao").scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Chat</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.4s ease forwards;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f1f1f1;
+      margin: 0;
+      display: flex;
+      height: 100vh;
+    }
+
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-header {
+      background-color: #800000;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 18px;
+      font-weight: 600;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .chat-header .left-side {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .chat-header .right-side {
+      display: flex;
+      gap: 10px;
+    }
+
+    .chat-header button {
+      background-color: white;
+      color: #800000;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    .chat-header button:hover {
+      background-color: #f5f5f5;
+      transform: scale(1.05);
+    }
+
+    .channel-selector {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .channel-selector .channel {
+      background-color: white;
+      color: #800000;
+      border-radius: 20px;
+      padding: 6px 12px;
+      font-size: 14px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    .channel-selector .channel:hover {
+      background-color: #f0f0f0;
+      transform: translateY(-2px);
+    }
+
+    .channel-selector .channel.active {
+      background-color: #800000;
+      color: white;
+    }
+
+    .chat-container {
+      flex: 1;
+      padding: 20px;
+      background-color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      background-color: #fdfdfd;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+
+    .message {
+      margin-bottom: 12px;
+      background-color: #f8f8f8;
+      padding: 10px;
+      border-radius: 6px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    .message strong {
+      color: #800000;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    .input-group input {
+      flex: 1;
+      padding: 14px 20px;
+      font-size: 16px;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+    }
+
+    .input-group button {
+      padding: 14px 24px;
+      background-color: #800000;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    .input-group button:hover {
+      background-color: #a00;
+      transform: scale(1.03);
+    }
+
+    .messages::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    .messages::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+
+    .messages::-webkit-scrollbar-thumb {
+      background-color: #800000;
+      border-radius: 10px;
+      border: 2px solid #f1f1f1;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 100;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background-color: white;
+      padding: 25px;
+      border-radius: 12px;
+      text-align: center;
+      max-width: 350px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      transform: scale(0.95);
+      transition: all 0.3s ease;
+    }
+
+    .modal.show .modal-content {
+      transform: scale(1);
+    }
+
+    .modal-buttons {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .modal-buttons button {
+      padding: 10px 20px;
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    .modal-buttons .confirm {
+      background-color: #800000;
+      color: white;
+    }
+
+    .modal-buttons .confirm:hover {
+      background-color: #a00;
+    }
+
+    .modal-buttons .cancel {
+      background-color: #ccc;
+      color: #333;
+    }
+
+    .dark-mode {
+      background-color: #121212;
+      color: #f0f0f0;
+    }
+
+    .dark-mode .chat-header {
+      background-color: #1f1f1f;
+    }
+
+    .dark-mode .channel-selector .channel {
+      background-color: #333;
+      color: #fff;
+    }
+
+    .dark-mode .channel-selector .channel.active {
+      background-color: #800000;
+    }
+
+    .dark-mode .main,
+    .dark-mode .chat-container {
+      background-color: #181818;
+    }
+
+    .dark-mode .messages {
+      background-color: #222;
+      border-color: #444;
+    }
+
+    .dark-mode .message {
+      background-color: #2a2a2a;
+    }
+
+    .dark-mode .input-group input {
+      background-color: #2a2a2a;
+      color: white;
+      border-color: #555;
+    }
+
+    .dark-mode .modal-content {
+      background-color: #333;
+      color: white;
+    }
+
+    .back-button {
+      margin: 15px;
+      padding: 10px 20px;
+      background-color: white;
+      color: #800000;
+      border: 2px solid #800000;
+      border-radius: 10px;
+      font-weight: bold;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.3s ease;
+    }
+
+    .back-button:hover {
+      background-color: #800000;
+      color: white;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <div class="main">
+    <div class="chat-header">
+      <div class="left-side">
+        <div id="channelName"># adm</div>
+        <div class="channel-selector">
+          <button class="channel active" onclick="switchChannel('adm')">👮‍♂️ # adm</button>
+          <button class="channel" onclick="switchChannel('geral')">💬 # geral</button>
+          <button class="channel" onclick="switchChannel('gremio')">🎓 # grêmio</button>
+        </div>
+      </div>
+      <div class="right-side">
+        <a class="back-button" href="news.html">← Voltar para Notícias</a>
+        <button onclick="toggleDarkMode()">🌙</button>
+        <button onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+      </div>
+    </div>
+
+    <div class="chat-container">
+      <div class="messages" id="messages"></div>
+      <div class="input-group">
+        <input type="text" id="messageInput" placeholder="Digite sua mensagem..." onkeydown="if(event.key==='Enter') sendMessage()" />
+        <button onclick="sendMessage()">Enviar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="deleteModal" class="modal">
+    <div class="modal-content">
+      <p>Deseja excluir esta mensagem?</p>
+      <div class="modal-buttons">
+        <button class="confirm" onclick="confirmDelete()">Excluir</button>
+        <button class="cancel" onclick="closeModal()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    if (!sessionStorage.getItem("loggedInUser")) {
+      window.location.href = "./news.html";
+    }
+
+    let currentChannel = 'adm';
+    let messageToDeleteIndex = null;
+    let lastMessagesJSON = "";
+    const API_BASE = "";
+
+    function logout() {
+      sessionStorage.removeItem("loggedInUser");
+      window.location.href = "./news.html";
+    }
+
+    function switchChannel(channel) {
+      currentChannel = channel;
+      document.getElementById("channelName").textContent = `# ${channel}`;
+      document.querySelectorAll(".channel").forEach(btn => btn.classList.remove("active"));
+      document.querySelector(`.channel[onclick="switchChannel('${channel}')"]`).classList.add("active");
+      loadMessages();
+    }
+
+    async function loadMessages() {
+      const messagesContainer = document.getElementById("messages");
+      try {
+        const res = await fetch(`${API_BASE}/messages/${currentChannel}`);
+        if (!res.ok) throw new Error("Erro ao buscar mensagens");
+        const messages = await res.json();
+
+        const messagesJSON = JSON.stringify(messages);
+        if (messagesJSON === lastMessagesJSON) return;
+        lastMessagesJSON = messagesJSON;
+
+        messagesContainer.innerHTML = "";
+        messages.forEach((msg, idx) => {
+          displayMessage(msg.username, msg.text, idx);
+        });
+      } catch (err) {
+        console.error("Erro ao carregar mensagens:", err);
+      }
+    }
+
+    function displayMessage(username, text, index) {
+      const div = document.createElement("div");
+      div.classList.add("message", "fade-in");
+      div.innerHTML = `<strong>${username}:</strong> ${text}`;
+      div.oncontextmenu = e => {
+        e.preventDefault();
+        messageToDeleteIndex = index;
+        openModal();
+      };
+      const messagesContainer = document.getElementById("messages");
+      messagesContainer.appendChild(div);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const input = document.getElementById("messageInput");
+      const text = input.value.trim();
+      if (!text) return;
+
+      let username = "Anônimo";
+      try {
+        const user = JSON.parse(sessionStorage.getItem("loggedInUser"));
+        if (user?.username) username = user.username;
+      } catch {}
+
+      try {
+        const res = await fetch(`${API_BASE}/messages/${currentChannel}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, text })
+        });
+        if (!res.ok) throw new Error("Erro ao enviar mensagem");
+        input.value = "";
+        loadMessages();
+      } catch (err) {
+        console.error(err);
+        alert("Erro ao enviar mensagem");
+      }
+    }
+
+    function openModal() {
+      const modal = document.getElementById("deleteModal");
+      modal.classList.add("show");
+      modal.style.display = "flex";
+    }
+
+    function closeModal() {
+      const modal = document.getElementById("deleteModal");
+      modal.classList.remove("show");
+      modal.style.display = "none";
+      messageToDeleteIndex = null;
+    }
+
+    async function confirmDelete() {
+      if (messageToDeleteIndex === null) return;
+      try {
+        const res = await fetch(`${API_BASE}/messages/${currentChannel}/${messageToDeleteIndex}`, {
+          method: "DELETE"
+        });
+        if (!res.ok) throw new Error("Erro ao deletar mensagem");
+        closeModal();
+        loadMessages();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark-mode");
+      localStorage.setItem("darkMode", document.body.classList.contains("dark-mode"));
+    }
+
+    window.onload = () => {
+      if (localStorage.getItem("darkMode") === "true") {
+        document.body.classList.add("dark-mode");
+      }
+      loadMessages();
+    };
+
+    setInterval(loadMessages, 2000);
+  </script>
+</body>
+</html>
