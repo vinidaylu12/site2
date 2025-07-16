@@ -1,10 +1,13 @@
 {
-  "name": "meu-projeto-noticias",
+  "name": "meu-projeto",
   "version": "1.0.0",
+  "description": "Servidor Node.js para notícias e chat",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
+  "author": "Seu Nome",
+  "license": "MIT",
   "dependencies": {
     "express": "^4.18.2"
   }
